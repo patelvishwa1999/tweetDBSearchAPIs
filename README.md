@@ -1,4 +1,7 @@
-# tweetDBSearchAPIs
+# tweetDBSearchAPIs 
+
+LIVE APPLICATION : `https://adbms.s3.amazonaws.com/home.html`
+
 Search application for a tweet store, combining relational and non-relational datastores to offer various search options and drill-down features for optimized querying of tweet data.
 
 This project implements a caching system and search application for a tweet store using AWS services, Python, and web technologies.
@@ -99,3 +102,46 @@ parameters :
  numberOfUsers : number of users to be fetched (Number | Required)
 
 response : JSON object of users.
+
+
+
+
+## Cache Mechanism
+### Caching with LRUCache and AWS S3:
+
+#### LRUCache Features:
+
+Capacity: Limits the number of items in the cache.
+
+OrderedDict: Remembers the order of insertion to evict the least recently used item.
+
+Time to Live (TTL): Items expire after a set duration.
+
+#### Operational Methods:
+
+Get: Retrieves items if they are within TTL, otherwise removes stale entries.
+
+Put: Inserts new items and evicts the oldest if the cache reaches capacity.
+
+#### Integration with AWS S3:
+
+Save to S3: Serializes and saves the current state of the cache to S3 for persistence.
+
+Load from S3: Reloads the cache from S3.
+
+#### Performance Optimization:
+
+Reduces database load by caching frequent queries.
+
+Enhances response times by avoiding repeated data retrieval operations.
+
+User Interface
+The user interface is designed using HTML, CSS, and JavaScript to offer a user-friendly experience for querying tweet data.
+
+## How to Use
+- Clone this repository.
+- Configure AWS credentials.
+- Deploy Lambda functions and APIs.
+- Access the web application via the provided URL.
+- Explore various search options and caching features.
+
