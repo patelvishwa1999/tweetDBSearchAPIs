@@ -5,11 +5,11 @@ This project implements a caching system and search application for a tweet stor
 
 ## Architecture :
 
-Data Models :
+### Data Models
 
+<img src='https://github.com/patelvishwa1999/tweetDBSearchAPIs/blob/d215e3973eb66dd4857fbfdf94bf5f2a4ad5f13a/docs/model_ADBMS.jpeg' >
 
-
-AWS Services Used:
+### AWS Services Used
 
 *AWS S3 (Simple Storage Service)*: Stores raw data files.
 
@@ -20,6 +20,8 @@ AWS Services Used:
 *Amazon DynamoDB*: Stores tweet data in three tables - one for tweets, one for retweets and one for hashtags.
 
 *Amazon API Gateway*: To build REST APIs on top of lambda functions of query.
+
+<img src='https://github.com/patelvishwa1999/tweetDBSearchAPIs/blob/d215e3973eb66dd4857fbfdf94bf5f2a4ad5f13a/docs/system_architecture_ADBMS.jpeg' >
 
 
 ## Search APIs:
