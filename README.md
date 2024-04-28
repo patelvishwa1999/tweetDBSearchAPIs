@@ -83,6 +83,22 @@ parameter : tweet_id (String | Required)
 
 response : JSON object of a tweet detail
 
+**`userTweets`**
+
+GET | `https://h8q6rd39sj.execute-api.us-east-1.amazonaws.com/dev/usertweets`
+
+parameter : user_id (String | Required)
+
+response : JSON object of a tweets
+
+**`tweetRetweets`**
+
+GET | `https://2qcgsfyoag.execute-api.us-east-1.amazonaws.com/dev/retweets`
+
+parameter : tweet_id (String | Required)
+
+response : JSON object of a retweets
+
 **`getCacheStatus`**
 
 GET | `https://ys0s790fhg.execute-api.us-east-1.amazonaws.com/dev/getCacheStatus`
