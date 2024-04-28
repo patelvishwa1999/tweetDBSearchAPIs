@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search App</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    body {
+        background-color: #FFFFFF; /* white background */
+    }
+
+    .btn-primary {
+        background-color: #001a36; /* blue button */
+        border-color: #001a36; /* blue border */
+    }
+
+    .btn-primary:hover {
+        background-color: #001a36; /* Blue button on hover */
+        border-color: #001a36; /* Blue border on hover */
+    }
+
+    .orange-header {
+        color: #001a36; /* Orange font color */
+    }
+
+    .container {
+        text-align: left;
+        margin-top: 50px;
+        margin-left: 20px;
+    }
+
+    .search-bar {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-bar input {
+        flex: 1;
+        width: 20%; /* Adjusting the width to 50% */
+        margin-right: 10px;
+    }
+
+    .search-button, .top-users-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .search-button img, .top-users-button img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .scrollable-section {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .card-body {
+        cursor: pointer;
+    }
+
+    /* Hide sections by default */
+    .users-section, .tweets-section {
+        display: none;
+    }
+
+    .badge-primary {
+        background-color: #FFA500; /* Orange badge */
+    }
+
+    .criteria-number {
+        font-size: larger;
+        color: #000; /* Black font color */
+    }
+
+    .loading-indicator {
+        display: none;
+    }
+
+    /* Styles for query metrics card */
+    .query-metrics-card {
+        margin-top: 1.5rem;
+        text-align: left;
+        background-color: #F8F9FA; /* Grey background */
+    }
+
+    .query-metrics-card .card {
+        width: 50%; /* Ensure card width fills container */
+    }
+    .navbar {
+        background-color: #001a36; /* Blue navbar */
+    }
+
+    .navbar-brand {
+        color: #ffffff; /* White text */
+    }
+
+    .navbar-nav .nav-link {
+        color: #ffffff; /* White text */
+    }
+</style>
+</head>
+<body>
+
+<!-- Navigation bar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">2024SP - SPEC TOP DATA SCI 16:954:694:01</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="oneSearch.html">Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="topUsers.html">User Stats</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="getCacheStatus.html">Cache Status</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 class="orange-header">Search the Tweets Store</h1>
+
+    <!-- Search bar -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search">
+        <button onclick="search()" class="search-button"><img src="https://img.icons8.com/?size=100&id=7695&format=png" alt="Search"></button>
+        <button onclick="redirectToTopUsers()" class="top-users-button"><img src="https://img.icons8.com/?size=100&id=999&format=png" alt="Top Users"></button> <!-- Top Users button -->
+    </div>
+
+    <!-- Query Metrics Card -->
+    <div class="query-metrics-card"></div>
+
+    <!-- Search results -->
+    <div class="search-results" style="display: none;">
+        <h2 id="searchResultsTitle"></h2>
+        <div class="users-section">
+            <div class="scrollable-section" id="usersResults"></div>
+        </div>
+        <div class="tweets-section">
+            <div class="scrollable-section" id="tweetsResults"></div>
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div class="loading-indicator text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+</div>
+<script>
+    // Function to perform search based on input
+    function search() {
+        const searchTerm = document.getElementById('searchInput').value.trim();
+        const isHashtag = searchTerm.startsWith('#');
+
+        // Clear previous search results and display loading indicator
+        clearSearchResults();
+        showLoadingIndicator();
+
+        if (isHashtag) {
+            searchTweetsByHashtag(searchTerm.substring(1));
+        } else {
+            searchUsers(searchTerm);
+        }
+    }
+
+    // Function to clear previous search results
+    function clearSearchResults() {
+        document.getElementById('searchResultsTitle').textContent = '';
+        document.getElementById('usersResults').innerHTML = '';
+        document.getElementById('tweetsResults').innerHTML = '';
+        document.querySelector('.users-section').style.display = 'none';
+        document.querySelector('.tweets-section').style.display = 'none';
+        document.querySelector('.search-results').style.display = 'none';
+    }
+
+    // Function to display loading indicator
+    function showLoadingIndicator() {
+        document.querySelector('.loading-indicator').style.display = 'block';
+    }
+
+    // Function to hide loading indicator
+    function hideLoadingIndicator() {
+        document.querySelector('.loading-indicator').style.display = 'none';
+    }
+
+    // Function to fetch search results for Users
+    function searchUsers(searchTerm) {
+        var startTime = performance.now();
+        fetch('https://w8yh8w1fxb.execute-api.us-east-1.amazonaws.com/dev/userSearch?search_string=' + searchTerm)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                var endTime = performance.now(); // End time of the query
+                var queryTime = endTime - startTime; // Calculate query time
+                hideLoadingIndicator(); // Hide loading indicator
+                if (data.length === 0) {
+                    document.getElementById('searchResultsTitle').textContent = 'Oops! No users found!';
+                } else {
+                    // Display query metrics
+                    displayQueryMetrics(data.length, queryTime);
+                    displayUsersResults(data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+                hideLoadingIndicator(); // Hide loading indicator
+            });
+    }
+
+    // Function to fetch search results for Tweets by Hashtag
+    function searchTweetsByHashtag(hashtag) {
+        var startTime = performance.now();
+        fetch('https://78ijradnuk.execute-api.us-east-1.amazonaws.com/dev/tweetSearchByHashtag?search_string=' + hashtag)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                var endTime = performance.now(); // End time of the query
+                var queryTime = endTime - startTime; // Calculate query time
+                hideLoadingIndicator(); // Hide loading indicator
+                if (data.length === 0) {
+                    document.getElementById('searchResultsTitle').textContent = 'Oops! No tweets found!';
+                } else {
+                    // Display query metrics
+                    displayQueryMetrics(data.length, queryTime);
+                    displayTweetsResults(data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+                hideLoadingIndicator(); // Hide loading indicator
+            });
+    }
+
+    // Function to display User search results on the webpage
+    function displayUsersResults(results) {
+    const usersResults = document.getElementById('usersResults');
+
+    document.getElementById('searchResultsTitle').textContent = `${results.length} users found :`;
+
+    results.forEach(user => {
+        
+        const card = document.createElement('div');
+        card.classList.add('card', 'mb-2');
+        card.innerHTML = `
+            <div class="card-body" onclick="showUserDetails('${user.user_id_str}')">
+                <h5 class="card-title">${user.screen_name}</h5>
+                <p class="card-text">${user.name}</p>
+            </div>
+        `;
+        usersResults.appendChild(card);
+    });
+
+    document.querySelector('.users-section').style.display = 'block';
+    document.querySelector('.search-results').style.display = 'block';
+    }
+
+    // Function to display Tweets search results on the webpage
+    function displayTweetsResults(results) {
+        const tweetsResults = document.getElementById('tweetsResults');
+
+        document.getElementById('searchResultsTitle').textContent = `${results.length} tweets found :`;
+
+        results.forEach(tweet => {
+            const card = document.createElement('div');
+            card.classList.add('card', 'mb-2');
+            card.innerHTML = `
+                <div class="card-body" onclick="showTweetDetails('${tweet}')">
+                    <h5 class="card-title">tweet ID : ${tweet}</h5>
+                    <p class="card-text">get full details of tweet ID : ${tweet}</p>
+                </div>
+            `;
+            tweetsResults.appendChild(card);
+        });
+
+        document.querySelector('.tweets-section').style.display = 'block';
+        document.querySelector('.search-results').style.display = 'block';
+    }
+
+    // Function to navigate to UserDetails page
+    function showUserDetails(userId) {
+    window.location.href = 'userDetails.html?user_id=' + userId;
+    }
+
+    // Function to navigate to TweetDetails page
+    function showTweetDetails(tweetId) {
+        window.location.href = 'tweetDetails.html?tweet_id=' + tweetId;
+    }
+    
+    // Function to display query metrics
+    function displayQueryMetrics(recordCount, queryTime) {
+        var queryMetricsDiv = document.querySelector('.query-metrics-card');
+        queryMetricsDiv.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Query Metrics</h5>
+                    <p class="card-text"><strong> Records Retrieved: </strong> ${recordCount}</p>
+                    <p class="card-text"><strong>Query Time: </strong> ${queryTime.toFixed(2)} ms</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // Function to redirect to topUsers.html
+    function redirectToTopUsers() {
+        window.location.href = 'topUsers.html';
+    }
+</script>
+
+</body>
+</html>

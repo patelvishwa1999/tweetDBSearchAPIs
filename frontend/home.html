@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tweet search app</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    body {
+        background-color: #c0c7db; /* Light gray background */
+        color: #212529; /* Dark text color */
+    }
+
+    .navbar {
+        background-color: #001a36; /* Blue navbar */
+    }
+
+    .navbar-brand {
+        color: #ffffff; /* White text */
+    }
+
+    .navbar-nav .nav-link {
+        color: #ffffff; /* White text */
+    }
+
+    .centered-buttons {
+        text-align: center;
+    }
+    .container {
+        text-align: left;
+        margin-top: 50px;
+        margin-left: 20px;
+    }
+
+    .btn-custom {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 18px;
+        border-radius: 5px;
+        background-color: #001a36; /* Blue button */
+        color: #ffffff; /* White text */
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-custom:hover {
+        background-color: #dbe2eb; /* Darker blue on hover */
+    }
+    .footer{
+        text-align: center;
+        color: #ffffff;
+    }
+</style>
+</head>
+<body>
+
+<!-- Navigation bar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">2024SP - SPEC TOP DATA SCI 16:954:694:01</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="oneSearch.html">Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="topUsers.html">User Stats</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="getCacheStatus.html">Cache Status</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Default page content -->
+<div class="container">
+    <h1>Welcome to our tweets store</h1>
+    <p>This is the default page content. You can navigate to other pages using the navigation bar.</p>
+
+    <h3>Functionalities:</h3>
+        <h4>Data Collection and Storage:</h4>
+        <p>We have utilized the Twitter data provided by the professor</p>
+        <p>The data is stored in two separate data stores: one relational (PostgresQL) and one non-relational(Dynamodb).</p>
+        <p>We use efficient Python code(a Lambda Function) to process tweets one at a time, simulating real-time data processing.</p>
+        
+        <h4>Caching Mechanism:</h4>
+        <p>Our project includes a LRU caching mechanism for storing frequently accessed data, such as popular hashtags, users, user details, tweet details.</p>
+        <p>The cache is implemented using a Python dictionary with eviction strategies to manage its size.</p>
+        <p>Cache Status page shows the data in cache for that moment to ensure the working of cache.</p>
+        
+        <h4>Search Application:</h4>
+        <p>Our search application allows users to search tweets by hashtag and user.</p>
+        <p>After the search results, you can view meta-data such as tweet author, tweet time, and retweet count for each of the tweets.</p>
+        <p>Drill-down search features enable users to explore user deatils and other actions by the user author(tweets).</p>
+        
+        <h4>Top-Level Metrics:</h4>
+        <p>We provide top users by 3 metrics to give users quick insights into the most active users</p>
+
+        <div class="footer">
+            <p>Team 24 : Vishwa Patel, Akshay Amarnath Mudda, Rohit Rao, Smrithi Shankar</p>
+        </div>
+    
+
+    <!-- Centered buttons -->
+    <div class="centered-buttons">
+        <a href="oneSearch.html" class="btn btn-custom">Search</a>
+        <a href="topUsers.html" class="btn btn-custom">User Stats</a>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top Users</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    body {
+        background-color: #F8F9FA; /* Grey background */
+    }
+
+    .btn-primary {
+        background-color:   #001a36; /* Orange button */
+        border-color:  #001a36; /* Orange border */
+    }
+
+    .badge-primary {
+        background-color: #F8F9FA; /* Orange badge */
+    }
+
+    .criteria-number {
+        font-size: larger;
+        color: #000; /* Black font color */
+    }
+
+    .navbar {
+        background-color: #001a36; /* Blue navbar */
+    }
+
+    .navbar-brand {
+        color: #ffffff; /* White text */
+    }
+
+    .navbar-nav .nav-link {
+        color: #ffffff; /* White text */
+    }
+    .container {
+        text-align: left;
+        margin-top: 50px;
+        margin-left: 20px;
+    }
+
+    .query-metrics-card {
+        margin-top: 1.5rem;
+        text-align: left;
+        background-color: #F8F9FA /* Align content to the left */
+    }
+
+    .query-metrics-card .card {
+        width: 50%; /* Ensure card width fills container */
+    }
+    .list-group {
+        margin-top: 1.5rem;
+        text-align: left;
+    }
+</style>
+</head>
+<body>
+
+<!-- Navigation bar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">2024SP - SPEC TOP DATA SCI 16:954:694:01</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="oneSearch.html">Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="topUsers.html">User Stats</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="getCacheStatus.html">Cache Status</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h2 class="text-left mb-4">Top Users</h2>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="input-group">
+                <select id="criteria" class="custom-select">
+                    <option value="followers_count">Followers Count</option>
+                    <option value="friends_count">Friends Count</option>
+                    <option value="favourites_count">Favourites Count</option>
+                    <!-- Add more options as needed -->
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                <select id="numberOfUsers" class="custom-select">
+                    <option value="1">Top 1</option>
+                    <option value="5">Top 5</option>
+                    <option value="10">Top 10</option>
+                    <option value="20">Top 20</option>
+                    <option value="50">Top 50</option>
+                    <option value="100">Top 100</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary" type="button" onclick="fetchTopUsers()">Fetch</button>
+        </div>
+    </div>
+    <div class="query-metrics-card"></div> <!-- Query Metrics Card -->
+    <div id="topUsers" class="row justify-content-start mt-3"></div> <!-- Results Cards -->
+</div>
+
+<script>
+function fetchTopUsers() {
+    var criteria = document.getElementById('criteria').value;
+    var numberOfUsers = document.getElementById('numberOfUsers').value;
+    var url = 'https://yequtjtjbb.execute-api.us-east-1.amazonaws.com/dev/top10users?option=' + criteria + '&numberOfUsers=' + numberOfUsers;
+    
+    var startTime = performance.now(); // Start time of the query
+    
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        var endTime = performance.now(); // End time of the query
+        var queryTime = endTime - startTime; // Calculate query time
+        
+        var topUsersDiv = document.getElementById('topUsers');
+        topUsersDiv.innerHTML = ''; // Clear previous results
+        
+        var list = document.createElement('ul');
+        list.className = 'list-group col-md-6';
+        
+        data.forEach(user => {
+            var listItem = document.createElement('li');
+            listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            listItem.innerHTML = `
+                <div>
+                    <h5 class="mb-0">${user.name}</h5>
+                    <small class="text-muted">${user.screen_name}</small>
+                </div>
+                <span class="badge badge-primary criteria-number">${user[criteria]}</span>
+            `;
+            list.appendChild(listItem);
+        });
+        
+        topUsersDiv.appendChild(list);
+        
+        // Display query metrics
+        displayQueryMetrics(data.length, queryTime);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function displayQueryMetrics(recordCount, queryTime) {
+    var queryMetricsDiv = document.querySelector('.query-metrics-card');
+    queryMetricsDiv.innerHTML = `
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Query Metrics</h5>
+                <p class="card-text">Records Retrieved: ${recordCount}</p>
+                <p class="card-text">Query Time: ${queryTime.toFixed(2)} milliseconds</p>
+            </div>
+        </div>
+    `;
+}
+</script>
+
+</body>
+</html>

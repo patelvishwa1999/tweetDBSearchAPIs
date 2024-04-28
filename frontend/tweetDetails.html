@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tweet Details</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    /* Add your CSS styles here */
+    .btn-custom {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 18px;
+        border-radius: 5px;
+        background-color: #001a36; /* Blue button */
+        color: #ffffff; /* White text */
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-custom:hover {
+        background-color: #dbe2eb; /* Darker blue on hover */
+    }
+    .navbar {
+        background-color: #001a36; /* Blue navbar */
+    }
+
+    .navbar-brand {
+        color: #ffffff; /* White text */
+    }
+
+    .navbar-nav .nav-link {
+        color: #ffffff; /* White text */
+    }
+    .container {
+        text-align: left;
+        margin-top: 50px;
+        margin-left: 20px;
+    }
+    
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="orange-header">Tweet Details</h1>
+    <div id="tweetDetails" class="tweet-details-card"></div>
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <button id="retweetsButton" class="btn btn-primary" style="display:none;">Retweets</button>
+    <div id="retweetsContainer"></div>
+    <button class="btn btn-custom" onclick="goBack()">Back</button>
+</div>
+
+<script>
+    async function fetchTweetDetails(tweetId) {
+        const url = 'https://pltpf3le6d.execute-api.us-east-1.amazonaws.com/dev/tweetDetails?tweet_id=' + tweetId;
+        try {
+            const response = await fetch(url);
+            const tweetData = await response.json();
+
+            if (typeof tweetData === 'object' && Object.keys(tweetData).length > 0) {
+                const tweetDetailsDiv = document.getElementById('tweetDetails');
+                tweetDetailsDiv.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text"><strong>Tweet ID:</strong> ${tweetData.tweet_id}</p>
+                            <p class="card-text"><strong>User ID:</strong> ${tweetData.user_id}</p>
+                            <p class="card-text"><strong>Tweet Type:</strong> ${tweetData.tweet_type}</p>
+                            <p class="card-text"><strong>Text:</strong> ${tweetData.text}</p>
+                            <p class="card-text"><strong>Language:</strong> ${tweetData.language}</p>
+                            <p class="card-text"><strong>Created At:</strong> ${tweetData.created_at}</p>
+                            <p class="card-text"><strong>Favorite Count:</strong> ${tweetData.favorite_count}</p>
+                            <p class="card-text"><strong>Reply Count:</strong> ${tweetData.reply_count}</p>
+                            <p class="card-text"><strong>Retweet Count:</strong> ${tweetData.retweet_count}</p>
+                            <p class="card-text"><strong>Quote Count:</strong> ${tweetData.quote_count}</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('loadingIndicator').style.display = 'none';
+                if (tweetData.tweet_type === 'tweet') {
+                    document.getElementById('retweetsButton').style.display = 'block';
+                }
+            } else {
+                console.error('Invalid tweet details:', tweetData);
+                alert('Invalid tweet details. Please try again later.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while fetching tweet details. Please try again later.');
+        }
+    }
+
+    async function fetchRetweets(tweetId) {
+        const url = 'https://2qcgsfyoag.execute-api.us-east-1.amazonaws.com/dev/retweets?parent_tweet_id=' + tweetId;
+        try {
+            const response = await fetch(url);
+            const retweetsData = await response.json();
+
+            if (Array.isArray(retweetsData) && retweetsData.length > 0) {
+                const retweetsContainer = document.getElementById('retweetsContainer');
+                retweetsContainer.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">('${retweetsData.length}') retweets found</h5>
+                            ${retweetsData.map(retweet => `
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <p class="card-text"><strong>Retweet ID:</strong> ${retweet.retweet_id.S}</p>
+                                        <p class="card-text"><strong>Retweet Text:</strong> ${retweet.retweet_text.S}</p>
+                                        <p class="card-text"><strong>Retweet Created At:</strong> ${retweet.retweet_created_at.S}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                alert('No retweets found.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while fetching retweets. Please try again later.');
+        }
+    }
+
+    function goBack() {
+        window.history.back();
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const tweetId = params.get('tweet_id');
+    if (tweetId) {
+        document.getElementById('loadingIndicator').style.display = 'block';
+        fetchTweetDetails(tweetId);
+    } else {
+        console.error('Tweet ID not found in query parameters.');
+        alert('Tweet ID not found in query parameters.');
+    }
+
+    document.getElementById('retweetsButton').addEventListener('click', function() {
+        fetchRetweets(tweetId);
+    });
+</script>
+
+</body>
+</html>

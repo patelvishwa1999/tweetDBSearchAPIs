@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cache Statuses</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    body {
+        background-color: #ffffff; /* Light gray background */
+        color: #212529; /* Dark text color */
+    }
+
+    .container {
+        text-align: left;
+        margin-top: 50px;
+        margin-left: 20px;
+    }
+
+    .btn-primary {
+        background-color:   #001a36; /* Orange button */
+        border-color:  #001a36; /* Orange border */
+    }
+
+    .card {
+        margin-bottom: 20px; /* Add margin between cards */
+    }
+    .navbar {
+        background-color: #001a36; /* Blue navbar */
+    }
+
+    .navbar-brand {
+        color: #ffffff; /* White text */
+    }
+
+    .navbar-nav .nav-link {
+        color: #ffffff; /* White text */
+    }
+</style>
+</head>
+<body>
+
+<!-- Navigation bar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">2024SP - SPEC TOP DATA SCI 16:954:694:01</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="oneSearch.html">Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="topUsers.html">User Stats</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="getCacheStatus.html">Cache Status</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container">
+    <h1 class="mb-4">View Cache Status</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="cacheKey">Select Cache:</label>
+                <select class="form-control" id="cacheKey">
+                    <option value="userSearch">User Search</option>
+                    <option value="tweetSearchByHashtag">Tweet Search by Hashtag</option>
+                    <option value="userDetails">User Details</option>
+                    <option value="top10users">Top Users</option>
+                    <option value="tweetDetails">Tweet Details</option>
+                </select>
+            </div>
+            <button class="btn btn-primary " onclick="getCacheStatus()">Get Cache Status</button>
+        </div>
+    </div>
+
+    <div id="cacheStatus" class="mt-4" style="display: none;">
+        <!-- Cache status will be displayed here -->
+    </div>
+</div>
+
+<script>
+    function getCacheStatus() {
+        const cacheKey = document.getElementById('cacheKey').value;
+        fetchCacheStatus(cacheKey);
+    }
+
+    function fetchCacheStatus(key) {
+        fetch('https://ys0s790fhg.execute-api.us-east-1.amazonaws.com/dev/getCacheStatus?key=' + key)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayCacheStatus(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            });
+    }
+
+    function displayCacheStatus(data) {
+        const cacheStatusDiv = document.getElementById('cacheStatus');
+        cacheStatusDiv.innerHTML = '';
+
+        if (data.length === 0) {
+            cacheStatusDiv.innerHTML = '<p>Cache Empty</p>';
+        } else {
+            data.forEach(status => {
+                const card = document.createElement('div');
+                card.classList.add('card', 'mb-3');
+                card.innerHTML = `
+                    <div class="card-body">
+                        <h3 class="card-title">${status}</h5>
+                    </div>
+                `;
+                cacheStatusDiv.appendChild(card);
+            });
+        }
+
+        cacheStatusDiv.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
